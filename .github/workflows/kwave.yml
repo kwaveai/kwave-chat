@@ -1,13 +1,17 @@
 # KWAVE Link fork CI — builds the OpenClaw template image and pushes
 # to Fly's internal registry. New machines spawned by KWAVE Link's
-# companion (kwaveai/kwave-link → kwave-template Fly app) pull the
+# companion (kwaveai/kwave-link → chatmachine Fly app) pull the
 # :latest tag at workspace creation time.
 #
 # Pattern mirrors swiriwon/OAL-chat's `openagentlink-build` workflow:
 #   - per-customer template image, not a single shared service
-#   - pushed to registry.fly.io/kwave-template:latest
+#   - pushed to registry.fly.io/chatmachine:latest
 #   - one less external secret to manage in the Fly env (FLY_API_TOKEN
 #     stays inside Fly's auth scope)
+#
+# The `chatmachine` Fly app holds the registry slot only — it is not
+# runnable on its own. Per-company machines that KWAVE Link spawns
+# reference `image: registry.fly.io/chatmachine:latest`.
 #
 # Trigger: push to the `kwave` branch. The default `main` branch tracks
 # upstream openclaw and intentionally has no CI of its own (all upstream
@@ -37,12 +41,8 @@ jobs:
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
         run: |
-          # The Fly app `kwave-template` holds the registry slot. It is
-          # not runnable on its own — per-company machines reference
-          # `image: registry.fly.io/kwave-template:latest` when they
-          # spawn.
           flyctl deploy \
-            --app kwave-template \
+            --app chatmachine \
             --image-label latest \
             --build-only \
             --push \
