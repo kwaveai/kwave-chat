@@ -1,3 +1,8 @@
+// Mattermost type declarations define plugin contracts.
+import type {
+  ChannelPreviewStreamingConfig,
+  StreamingMode,
+} from "openclaw/plugin-sdk/channel-outbound";
 import type { BlockStreamingCoalesceConfig, DmPolicy, GroupPolicy } from "./runtime-api.js";
 import type { SecretInput } from "./secret-input.js";
 
@@ -51,6 +56,8 @@ export type MattermostAccountConfig = {
   textChunkLimit?: number;
   /** Chunking mode: "length" (default) splits by size; "newline" splits on every newline. */
   chunkMode?: "length" | "newline";
+  /** Preview streaming mode/config. */
+  streaming?: StreamingMode | boolean | ChannelPreviewStreamingConfig;
   /** Disable block streaming for this account. */
   blockStreaming?: boolean;
   /** Merge streamed block replies before sending. */

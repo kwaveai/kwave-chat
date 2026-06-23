@@ -1,3 +1,4 @@
+/** Resolves enabled bundled plugins that advertise a specific manifest contract list. */
 import type { OpenClawConfig } from "../config/types.openclaw.js";
 import {
   resolveBundledPluginCompatibleLoadValues,
@@ -8,6 +9,7 @@ import {
   normalizePluginsConfig,
   resolveEffectivePluginActivationState,
 } from "./config-state.js";
+import { isPluginEnabledByDefaultForPlatform } from "./default-enablement.js";
 import { loadManifestContractSnapshot } from "./manifest-contract-eligibility.js";
 import type { PluginManifestContractListKey, PluginManifestRecord } from "./manifest-registry.js";
 
@@ -15,6 +17,7 @@ function createPluginIdSet(pluginIds: readonly string[] | undefined): Set<string
   return pluginIds && pluginIds.length > 0 ? new Set(pluginIds) : null;
 }
 
+/** Lists bundled plugin ids with a non-empty contract contribution in a manifest snapshot. */
 export function listBundledManifestContractPluginIds(params: {
   plugins: readonly PluginManifestRecord[];
   contract: PluginManifestContractListKey;
@@ -32,6 +35,7 @@ export function listBundledManifestContractPluginIds(params: {
     .toSorted((left, right) => left.localeCompare(right));
 }
 
+/** Applies config activation and compatibility rules before returning bundled contract owners. */
 export function resolveEnabledBundledManifestContractPlugins(params: {
   config?: OpenClawConfig;
   workspaceDir?: string;
@@ -85,7 +89,7 @@ export function resolveEnabledBundledManifestContractPlugins(params: {
       origin: plugin.origin,
       config: normalizedPlugins,
       rootConfig: activation.config,
-      enabledByDefault: plugin.enabledByDefault,
+      enabledByDefault: isPluginEnabledByDefaultForPlatform(plugin),
       activationSource,
     }).enabled;
   });

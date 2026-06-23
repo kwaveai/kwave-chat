@@ -1,3 +1,4 @@
+// Whatsapp tests cover outbound mentions plugin behavior.
 import { describe, expect, it } from "vitest";
 import { resolveWhatsAppOutboundMentions } from "./outbound-mentions.js";
 
@@ -111,6 +112,19 @@ describe("resolveWhatsAppOutboundMentions", () => {
         "again @277038292303944",
       ].join("\n"),
       mentionedJids: ["277038292303944@lid"],
+    });
+  });
+
+  it("does not mention numeric prefixes inside longer tokens", () => {
+    expect(
+      resolveWhatsAppOutboundMentions({
+        chatJid: "120363000000000000@g.us",
+        text: "literal @15551234567abc and x@15551234567",
+        participants: [{ id: "15551234567@s.whatsapp.net" }],
+      }),
+    ).toEqual({
+      text: "literal @15551234567abc and x@15551234567",
+      mentionedJids: [],
     });
   });
 

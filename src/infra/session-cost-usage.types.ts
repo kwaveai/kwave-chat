@@ -1,3 +1,4 @@
+// Shared session cost and usage accounting type contracts.
 import type { NormalizedUsage } from "../agents/usage.js";
 import type {
   SessionUsageTimePoint as SharedSessionUsageTimePoint,
@@ -60,7 +61,16 @@ export type CostUsageSummary = {
   days: number;
   daily: CostUsageDailyEntry[];
   totals: CostUsageTotals;
+  cacheStatus?: {
+    status: "fresh" | "partial" | "stale" | "refreshing";
+    cachedFiles: number;
+    pendingFiles: number;
+    staleFiles: number;
+    refreshedAt?: number;
+  };
 };
+
+export type UsageCacheStatus = NonNullable<CostUsageSummary["cacheStatus"]>;
 
 export type SessionDailyUsage = {
   date: string; // YYYY-MM-DD

@@ -1,3 +1,4 @@
+// Wizard prompt types abstract selectable, confirm, and text prompts.
 export type WizardSelectOption<T = string> = {
   value: T;
   label: string;
@@ -18,14 +19,17 @@ export type WizardMultiSelectParams<T = string> = {
   searchable?: boolean;
 };
 
-export type WizardTextParams = {
+type WizardTextParams = {
   message: string;
   initialValue?: string;
   placeholder?: string;
   validate?: (value: string) => string | undefined;
+  // Render as a masked input. The entered value is never echoed to the
+  // terminal — keeps secrets out of scrollback, transcripts, and screenshots.
+  sensitive?: boolean;
 };
 
-export type WizardConfirmParams = {
+type WizardConfirmParams = {
   message: string;
   initialValue?: boolean;
 };

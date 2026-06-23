@@ -1,3 +1,4 @@
+// Qa Lab provider module implements model/runtime integration.
 import { createMockProviderMap } from "./mock-model-config.js";
 import type { QaProviderDefinition, QaProviderMode } from "./types.js";
 
@@ -25,8 +26,9 @@ export function createMockQaProviderDefinition(
       serverLabel: params.serverLabel,
     },
     defaultModel: (options) => mockModelRef(params.mode, options?.alternate),
-    defaultImageGenerationProviderIds: [],
-    defaultImageGenerationModel: () => `${params.mode}/gpt-image-1`,
+    defaultImageGenerationProviderIds: ["openai"],
+    defaultImageGenerationModel: ({ modelProviderIds }) =>
+      modelProviderIds.includes("openai") ? "openai/gpt-image-1" : null,
     usesFastModeByDefault: () => false,
     resolveModelParams: () => ({
       transport: "sse",

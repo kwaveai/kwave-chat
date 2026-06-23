@@ -1,12 +1,14 @@
-import type { GoogleMeetMode, GoogleMeetTransport } from "../config.js";
+// Google Meet type declarations define plugin contracts.
+import type { GoogleMeetMode, GoogleMeetModeInput, GoogleMeetTransport } from "../config.js";
 
 type GoogleMeetSessionState = "active" | "ended";
 
 export type GoogleMeetJoinRequest = {
   url: string;
   transport?: GoogleMeetTransport;
-  mode?: GoogleMeetMode;
+  mode?: GoogleMeetModeInput;
   message?: string;
+  requesterSessionKey?: string;
   timeoutMs?: number;
   dialInNumber?: string;
   pin?: string;
@@ -24,7 +26,8 @@ type GoogleMeetSpeechBlockedReason =
   | GoogleMeetManualActionReason
   | "not-in-call"
   | "browser-unverified"
-  | "audio-bridge-unavailable";
+  | "audio-bridge-unavailable"
+  | "meet-microphone-muted";
 
 export type GoogleMeetChromeHealth = {
   inCall?: boolean;
@@ -42,6 +45,33 @@ export type GoogleMeetChromeHealth = {
     speaker?: string;
     text: string;
   }>;
+  realtimeTranscriptLines?: number;
+  lastRealtimeTranscriptAt?: string;
+  lastRealtimeTranscriptRole?: "user" | "assistant";
+  lastRealtimeTranscriptText?: string;
+  recentRealtimeTranscript?: Array<{
+    at: string;
+    role: "user" | "assistant";
+    text: string;
+  }>;
+  lastRealtimeEventAt?: string;
+  lastRealtimeEventType?: string;
+  lastRealtimeEventDetail?: string;
+  recentRealtimeEvents?: Array<{
+    at: string;
+    direction: "client" | "server";
+    type: string;
+    detail?: string;
+  }>;
+  recentTalkEvents?: Array<{
+    id: string;
+    type: string;
+    sessionId: string;
+    turnId?: string;
+    seq: number;
+    timestamp: string;
+    final?: boolean;
+  }>;
   manualActionRequired?: boolean;
   manualActionReason?: GoogleMeetManualActionReason;
   manualActionMessage?: string;
@@ -52,6 +82,9 @@ export type GoogleMeetChromeHealth = {
   realtimeReady?: boolean;
   audioInputActive?: boolean;
   audioOutputActive?: boolean;
+  audioOutputRouted?: boolean;
+  audioOutputDeviceLabel?: string;
+  audioOutputRouteError?: string;
   lastInputAt?: string;
   lastOutputAt?: string;
   lastSuppressedInputAt?: string;
@@ -81,8 +114,10 @@ export type GoogleMeetSession = {
   participantIdentity: string;
   realtime: {
     enabled: boolean;
+    strategy?: string;
     provider?: string;
     model?: string;
+    transcriptionProvider?: string;
     toolPolicy: string;
   };
   chrome?: {

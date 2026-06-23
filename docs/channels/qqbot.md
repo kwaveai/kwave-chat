@@ -82,12 +82,28 @@ File-backed AppSecret:
 }
 ```
 
+Env SecretRef AppSecret:
+
+```json5
+{
+  channels: {
+    qqbot: {
+      enabled: true,
+      appId: "YOUR_APP_ID",
+      clientSecret: { source: "env", provider: "default", id: "QQBOT_CLIENT_SECRET" },
+    },
+  },
+}
+```
+
 Notes:
 
 - Env fallback applies to the default QQ Bot account only.
 - `openclaw channels add --channel qqbot --token-file ...` provides the
   AppSecret only; the AppID must already be set in config or `QQBOT_APP_ID`.
 - `clientSecret` also accepts SecretRef input, not just a plaintext string.
+- Legacy `secretref:/...` marker strings are not valid `clientSecret` values;
+  use structured SecretRef objects like the example above.
 
 ### Multi-account setup
 
@@ -136,7 +152,7 @@ to a group, then mention it or configure the group to run without a mention.
         "*": {
           requireMention: true,
           historyLimit: 50,
-          toolPolicy: "restricted",
+          tools: { deny: ["exec", "read", "write"] },
         },
         GROUP_OPENID: {
           name: "Release room",
@@ -158,9 +174,12 @@ settings include:
 - `requireMention`: require an @mention before the bot replies. Default: `true`.
 - `ignoreOtherMentions`: drop messages that mention someone else but not the bot.
 - `historyLimit`: keep recent non-mention group messages as context for the next mentioned turn. Set `0` to disable.
-- `toolPolicy`: `full`, `restricted`, or `none` for group-scoped tools.
+- `tools`: allow/deny tools for the whole group.
+- `toolsBySender`: per-sender group tool overrides; see [Groups](/channels/groups#groupchannel-tool-restrictions-optional).
 - `name`: friendly label used in logs and group context.
 - `prompt`: per-group behavior prompt appended to the agent context.
+
+Old QQBot `toolPolicy` entries are retired. Run `openclaw doctor --fix` to migrate them to `tools`.
 
 Activation modes are `mention` and `always`. `requireMention: true` maps to
 `mention`; `requireMention: false` maps to `always`. A session-level activation
@@ -193,7 +212,7 @@ STT and TTS support two-level configuration with priority fallback:
         voice: "your-voice",
       },
       accounts: {
-        qq-main: {
+        "qq-main": {
           tts: {
             providers: {
               openai: { voice: "shimmer" },
@@ -250,6 +269,11 @@ Built-in commands intercepted before the AI queue:
 Append `?` to any command for usage help (for example `/bot-upgrade ?`).
 
 Admin commands (`/bot-me`, `/bot-upgrade`, `/bot-logs`, `/bot-clear-storage`, `/bot-streaming`, `/bot-approve`) are direct-message-only and require the sender's openid in an explicit non-wildcard `allowFrom` list. A wildcard `allowFrom: ["*"]` permits chat but does not grant admin command access. Group messages match against `groupAllowFrom` first and fall back to `allowFrom`. Running an admin command in a group returns a hint rather than silently dropping.
+
+When QQ Bot exec approvals use the default same-chat fallback, native approval
+button clicks follow the same explicit non-wildcard command allowlist. To grant
+approval-only access without broader command access, configure
+`channels.qqbot.execApprovals.approvers`.
 
 ## Engine architecture
 

@@ -1,3 +1,4 @@
+// Qqbot plugin module implements register streaming behavior.
 import type { ApproveRuntimeGetter } from "../../adapter/commands.port.js";
 import type { SlashCommandRegistry } from "../slash-commands.js";
 import {
@@ -30,6 +31,7 @@ export function registerStreamingCommands(registry: SlashCommandRegistry): void 
   registry.register({
     name: "bot-streaming",
     description: "一键开关流式消息",
+    requireAuth: true,
     c2cOnly: true,
     usage: [
       `/bot-streaming on     开启流式消息`,
