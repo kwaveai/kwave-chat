@@ -1,0 +1,22 @@
+{
+  "id": "kwv",
+  "activation": {
+    "onStartup": true
+  },
+  "enabledByDefault": true,
+  "name": "KWAVE Logistics Approval",
+  "description": "Approve or cancel irreversible KWAVE logistics stock writes from a channel button (hard human confirmation).",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "approvers": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Channel sender ids allowed to approve/cancel KWAVE logistics actions. Empty denies everyone (fail-closed). Use \"*\" only to explicitly allow any channel-authorized sender."
+      }
+    }
+  }
+}
