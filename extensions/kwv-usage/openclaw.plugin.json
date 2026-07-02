@@ -1,0 +1,14 @@
+{
+  "id": "kwv-usage",
+  "activation": {
+    "onStartup": true
+  },
+  "enabledByDefault": true,
+  "name": "KWAVE Usage Reporter",
+  "description": "Reports per-turn model usage (provider, model, tokens, cost) to the KWAVE platform so chat spend shows up in workspace cost dashboards.",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {}
+  }
+}
