@@ -4,7 +4,11 @@ import {
   isHeartbeatOkResponse,
   isHeartbeatUserMessage,
 } from "./heartbeat-filter.js";
-import { HEARTBEAT_PROMPT, HEARTBEAT_TRANSCRIPT_PROMPT } from "./heartbeat.js";
+import {
+  HEARTBEAT_PROMPT,
+  HEARTBEAT_TRANSCRIPT_PROMPT,
+  LEGACY_HEARTBEAT_TRANSCRIPT_PROMPTS,
+} from "./heartbeat.js";
 
 describe("isHeartbeatUserMessage", () => {
   it("matches heartbeat prompts", () => {
@@ -32,6 +36,14 @@ describe("isHeartbeatUserMessage", () => {
         content: HEARTBEAT_TRANSCRIPT_PROMPT,
       }),
     ).toBe(true);
+  });
+
+  it("still matches the pre-rebrand transcript label stored in old sessions", () => {
+    // Historical transcripts carry the old vendor-named label. If the filter
+    // stopped matching them those turns would leak back into model context.
+    for (const legacy of LEGACY_HEARTBEAT_TRANSCRIPT_PROMPTS) {
+      expect(isHeartbeatUserMessage({ role: "user", content: legacy })).toBe(true);
+    }
   });
 
   it("ignores quoted or non-user token mentions", () => {
